@@ -8,7 +8,6 @@ http
   .listen(3000);
 
 const fs = require('fs');
-
 const json = JSON.parse(fs.readFileSync('./guild-info.json', 'utf8'));
 
 
@@ -16,17 +15,15 @@ const json = JSON.parse(fs.readFileSync('./guild-info.json', 'utf8'));
 const discord = require("discord.js");
 const client = new discord.Client();
 
-var gamerolepanel = true;
-var compassrolepanel = true;
 var letter = [":zero:",":one:",":two:",":three:",":four:",":five:",":six:",":seven:",":eight:",":nine:",":keycap_ten:",":regional_indicator_a:",":regional_indicator_b:",":regional_indicator_c:",":regional_indicator_d:",":regional_indicator_e:",":regional_indicator_f:",":regional_indicator_g:",":regional_indicator_h:",":regional_indicator_i:",":regional_indicator_j:",":regional_indicator_k:",":regional_indicator_l:",":regional_indicator_m:",":regional_indicator_n:",":regional_indicator_o:",":regional_indicator_p:",":regional_indicator_q:",":regional_indicator_r:",":regional_indicator_s:",":regional_indicator_t:",":regional_indicator_u:",":regional_indicator_v:",":regional_indicator_w:",":regional_indicator_x:",":regional_indicator_y:",":regional_indicator_z:"]
 var sign = ["0⃣","1⃣","2⃣","3⃣","4⃣","5⃣","6⃣","7⃣","8⃣","9⃣","🔟","🇦","🇧","🇨","🇩","🇪","🇫","🇬","🇭","🇮","🇯","🇰","🇱","🇲","🇳","🇴","🇵","🇶","🇷","🇸","🇹","🇺","🇻","🇼","🇽","🇾","🇿"]
-//const prefix = json[0].Yaminabe.Prefix;
+
 
 
 client.on("ready", message => {
   console.log("bot is ready!");
-    client.channels.cache.get(json[0].Yaminabe.OperationChannel.Gamerole).messages.fetch('719091308920307763');
-    client.channels.cache.get(json[0].Yaminabe.OperationChannel.Compass).messages.fetch('719090909014392873');
+    client.channels.cache.get(json[0].Yaminabe.OperationChannel.Gamerole).messages.fetch(json[0].Yaminabe.MessageId.GamerolePanel);
+    client.channels.cache.get(json[0].Yaminabe.OperationChannel.Compass).messages.fetch(json[0].Yaminabe.MessageId.CompassPanel);
   });
 
 
@@ -70,7 +67,7 @@ client.on("message", async message => {
                   json[0].Yaminabe.KickReason.other.outside
                 ];}else return message.guild.channels.cache.get(json[0].Yaminabe.OperationChannel.BotPanel).send({
                                  embed: {
-                                     title: "kickするメンバーを1人指定してください",
+                                     title: "正しい理由選択番号を入力してください。",
                                      color: json[0].Yaminabe.Color.failed,
                                      timestamp: new Date()
                                  }
@@ -143,12 +140,17 @@ client.on("message", async message => {
                    });
 
           var reason;
-            if (message.content.endsWith("1"))
+            if (message.content.endsWith("1")){
               reason = [
                 json[0].Yaminabe.BanReason.order.inside,
                 json[0].Yaminabe.BanReason.order.outside
-              ];
-          //if(message.content.endsWith('2'))  reason = (json[0].Yaminabe.KickReason.Stop);
+              ];}else return message.guild.channels.cache.get(json[0].Yaminabe.OperationChannel.BotPanel).send({
+                                 embed: {
+                                     title: "正しい理由選択番号を入力してください。",
+                                     color: json[0].Yaminabe.Color.failed,
+                                     timestamp: new Date()
+                                 }
+                               });
           
           message.mentions.members.first().send({
             embed: {
@@ -223,7 +225,7 @@ client.on("message", async message => {
                     timestamp: new Date()
                   }
                 });
-      var msg = await client.channels.cache.get(json[0].Yaminabe.OperationChannel.Gamerole).messages.fetch('719091308920307763')
+      var msg = await client.channels.cache.get(json[0].Yaminabe.OperationChannel.Gamerole).messages.fetch(json[0].Yaminabe.MessageId.GamerolePanel)
       var text =("**ゲームロール**\nリアクションを押すことで役職が付きます。\n" + letter[0] +" : " +json[0].Yaminabe.Gamerole[0][0]+"\n");
       msg.react(sign[0]);
       for(var i=1; i<json[0].Yaminabe.Gamerole.length; i++){
@@ -243,7 +245,7 @@ client.on("message", async message => {
                     timestamp: new Date()
                   }
                 });
-      var msg = await client.channels.cache.get(json[0].Yaminabe.OperationChannel.Compass).messages.fetch('719090909014392873')
+      var msg = await client.channels.cache.get(json[0].Yaminabe.OperationChannel.Compass).messages.fetch(json[0].Yaminabe.MessageId.CompassPanel)
       var text =("**コンパスランク**\nリアクションを押すことで役職が付きます。\n" + letter[0] +" : " +json[0].Yaminabe.CompassRank[0][0]+"\n");
       msg.react(sign[0]);
       for(var i=1; i<json[0].Yaminabe.CompassRank.length; i++){
@@ -293,7 +295,7 @@ client.on("messageReactionAdd", async(messageReaction ,user) =>{
                 });
             reply.delete({ timeout: 5000 });
         };
-        };
+    };
 });
 
 client.on("messageReactionRemove", async(messageReaction ,user) =>{
@@ -329,7 +331,6 @@ client.on("messageReactionRemove", async(messageReaction ,user) =>{
             reply.delete({ timeout: 5000 });
         };
     }; 
-         
 });
 
 if (process.env.DISCORD_BOT_TOKEN == undefined) {
