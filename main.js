@@ -226,9 +226,8 @@ client.on("message", async message => {
                   }
                 });
       var msg = await client.channels.cache.get(json[0].Yaminabe.OperationChannel.Gamerole).messages.fetch(json[0].Yaminabe.MessageId.GamerolePanel)
-      var text =("**ゲームロール**\nリアクションを押すことで役職が付きます。\n" + letter[0] +" : " +json[0].Yaminabe.Gamerole[0][0]+"\n");
-      msg.react(sign[0]);
-      for(var i=1; i<json[0].Yaminabe.Gamerole.length; i++){
+      var text =("**ゲームロール**\nリアクションを押すことで役職が付きます。\n");
+      for(var i=0; i<json[0].Yaminabe.Gamerole.length; i++){
         text = (text + letter[i] +" : " +json[0].Yaminabe.Gamerole[i][0]+"\n");
         msg.react(sign[i]);
       };
@@ -246,9 +245,8 @@ client.on("message", async message => {
                   }
                 });
       var msg = await client.channels.cache.get(json[0].Yaminabe.OperationChannel.Compass).messages.fetch(json[0].Yaminabe.MessageId.CompassPanel)
-      var text =("**コンパスランク**\nリアクションを押すことで役職が付きます。\n" + letter[0] +" : " +json[0].Yaminabe.CompassRank[0][0]+"\n");
-      msg.react(sign[0]);
-      for(var i=1; i<json[0].Yaminabe.CompassRank.length; i++){
+      var text =("**コンパスランク**\nリアクションを押すことで役職が付きます。\n");
+      for(var i=0; i<json[0].Yaminabe.CompassRank.length; i++){
         text = (text + letter[i] +" : " +json[0].Yaminabe.CompassRank[i][0]+"\n");
         msg.react(sign[i]);
       };
@@ -266,7 +264,7 @@ client.on("message", async message => {
 client.on("messageReactionAdd", async(messageReaction ,user) =>{
   if(user.bot) return;
     if((messageReaction.message.channel.id === json[0].Yaminabe.OperationChannel.Compass)){
-      for(var i=0;i<36;i++)
+      for(var i=0;i<36;i++){
         if(messageReaction.emoji.name === sign[i]){
           var member = user.id
           await client.guilds.cache.get(json[0].Yaminabe.Server).members.cache.get(member).roles.add(json[0].Yaminabe.CompassRank[i][1])
@@ -279,10 +277,11 @@ client.on("messageReactionAdd", async(messageReaction ,user) =>{
                 });
             reply.delete({ timeout: 5000 });
         };
+      };
     };
 
   if((messageReaction.message.channel.id === json[0].Yaminabe.OperationChannel.Gamerole)){
-      for(var i=0;i<36;i++)
+      for(var i=0;i<36;i++){
         if(messageReaction.emoji.name === sign[i]){
           var member = user.id
           await client.guilds.cache.get(json[0].Yaminabe.Server).members.cache.get(member).roles.add(json[0].Yaminabe.Gamerole[i][1])
@@ -295,6 +294,7 @@ client.on("messageReactionAdd", async(messageReaction ,user) =>{
                 });
             reply.delete({ timeout: 5000 });
         };
+      };
     };
 });
 
