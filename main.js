@@ -6,11 +6,9 @@ http
     response.end("Discord bot is active now \n");
   })
   .listen(3000);
+
 const fs = require('fs');
 const json = JSON.parse(fs.readFileSync('./guild-info.json', 'utf8'));
-
-console.log(json[0].Yaminabe.Color.failed);
-
 
 // Discord bot implements
 const discord = require("discord.js");
