@@ -6,9 +6,10 @@ http
     response.end("Discord bot is active now \n");
   })
   .listen(3000);
-
 const fs = require('fs');
 const json = JSON.parse(fs.readFileSync('./guild-info.json', 'utf8'));
+
+console.log(json[0].Yaminabe.Color.failed);
 
 
 // Discord bot implements
@@ -22,6 +23,7 @@ var sign = ["0⃣","1⃣","2⃣","3⃣","4⃣","5⃣","6⃣","7⃣","8⃣","9⃣
 
 client.on("ready", message => {
   console.log("bot is ready!");
+    client.user.setActivity('ゲーム・コンパスランクロール付与中！', { type: 'PLAYING' })
     client.channels.cache.get(json[0].Yaminabe.OperationChannel.Gamerole).messages.fetch(json[0].Yaminabe.MessageId.GamerolePanel);
     client.channels.cache.get(json[0].Yaminabe.OperationChannel.Compass).messages.fetch(json[0].Yaminabe.MessageId.CompassPanel);
   });
@@ -34,45 +36,55 @@ client.on("message", async message => {
   if (message.content.startsWith("//kick")) {
     if (!(message.channel.id === json[0].Yaminabe.OperationChannel.BotPanel))  return message.delete();
       if (!message.member.roles.cache.get(json[0].Yaminabe.Roles.Nabe))
-        return message.guild.channels.cache.get(json[0].Yaminabe.OperationChannel.BotPanel).send({
+        return await message.guild.channels.cache.get(json[0].Yaminabe.OperationChannel.BotPanel).send({
                   embed: {
                       title: "実行する権限がありません。",
                       color: json[0].Yaminabe.Color.failed,
+                      "footer": {
+                            "text": "闇鍋bot",
+                            "icon_url": "https://cdn.discordapp.com/avatars/718662724732715019/725fafaf9c00b459c74793651a51460b.png"},
                       timestamp: new Date()
                   }
                });
           if (message.mentions.members.size !== 1)
-            return message.guild.channels.cache.get(json[0].Yaminabe.OperationChannel.BotPanel).send({
+            return await message.guild.channels.cache.get(json[0].Yaminabe.OperationChannel.BotPanel).send({
                       embed: {
                           title: "kickするメンバーを1人指定してください",
                           color: json[0].Yaminabe.Color.failed,
+                          "footer": {
+                                "text": "闇鍋bot",
+                                "icon_url": "https://cdn.discordapp.com/avatars/718662724732715019/725fafaf9c00b459c74793651a51460b.png"},
                           timestamp: new Date()
                       }
                    });
 
           var reason;
-              if (message.content.endsWith("1"))
+              if (message.content.endsWith("1")){
                 reason = [
                   json[0].Yaminabe.KickReason.NoSelfIntoroduction.inside,
                   json[0].Yaminabe.KickReason.NoSelfIntoroduction.outside
-                ];
-              if (message.content.endsWith("2"))
+                ];}
+              else if (message.content.endsWith("2")){
                 reason = [
                   json[0].Yaminabe.KickReason.order.inside,
                   json[0].Yaminabe.KickReason.order.outside
                 ];
-              if (message.content.endsWith("3")){
+              }
+              else if (message.content.endsWith("3")){
                 reason = [
                   json[0].Yaminabe.KickReason.other.inside,
                   json[0].Yaminabe.KickReason.other.outside
-                ];}else return message.guild.channels.cache.get(json[0].Yaminabe.OperationChannel.BotPanel).send({
+                ];}else return await message.guild.channels.cache.get(json[0].Yaminabe.OperationChannel.BotPanel).send({
                                  embed: {
                                      title: "正しい理由選択番号を入力してください。",
                                      color: json[0].Yaminabe.Color.failed,
+                                     footer: {
+                                           "text": "闇鍋bot",
+                                           "icon_url": "https://cdn.discordapp.com/avatars/718662724732715019/725fafaf9c00b459c74793651a51460b.png"},
                                      timestamp: new Date()
                                  }
                                });
-
+        try{
           message.mentions.members.first().send({
             embed: {
               title: "kickされました。",
@@ -81,6 +93,9 @@ client.on("message", async message => {
                 reason[1] +
                 "\n\n再度参加を希望される場合は、公式ホームページからお入りください。\nTeam鍋 Discordサーバー 「闇鍋」   運営一同 ",
               color: json[0].Yaminabe.Color.info,
+              footer: {
+                    text: "闇鍋bot",
+                    icon_url: "https://cdn.discordapp.com/avatars/718662724732715019/725fafaf9c00b459c74793651a51460b.png"},
               timestamp: new Date(),
               thumbnail: {
                 url:
@@ -88,10 +103,11 @@ client.on("message", async message => {
               }
             }
           });
-
+          }catch(e){console.log("kick system error\n"+e);};
+    
           const member = await message.mentions.members.first().kick(reason[0]);
-
-          message.channel.send({
+    
+          const text ={
             embed: {
               author: {
                 name: message.author.username,
@@ -101,40 +117,40 @@ client.on("message", async message => {
               description:
                 `${member.user.tag}をkickしました` + "\nreason : " + reason[0],
               color: json[0].Yaminabe.Color.kick,
+              footer: {
+                    text: "闇鍋bot",
+                    icon_url: "https://cdn.discordapp.com/avatars/718662724732715019/725fafaf9c00b459c74793651a51460b.png"},
               timestamp: new Date()
             }
-          });
-          message.guild.channels.cache.get(json[0].Yaminabe.OperationChannel.log).send({
-              embed: {
-                author: {
-                  name: message.author.username,
-                  icon_url: message.author.defaultAvatarURL
-                },
-                title: "Kicked User",
-                description:
-                  `${member.user.tag}をkickしました` + "\nreason : " + reason[0],
-                color: json[0].Yaminabe.Color.kick,
-                timestamp: new Date()
-              }
-            });
+          };
+    
+          await message.channel.send(text);
+          await message.guild.channels.cache.get(json[0].Yaminabe.OperationChannel.log).send(text);
         };
 
+  
   //ban system
   if (message.content.startsWith("//ban")) {
     if (!(message.channel.id === json[0].Yaminabe.OperationChannel.BotPanel))  return message.delete();
       if (!message.member.roles.cache.get(json[0].Yaminabe.Roles.Owner))
-        return message.guild.channels.cache.get(json[0].Yaminabe.OperationChannel.BotPanel).send({
+        return await message.guild.channels.cache.get(json[0].Yaminabe.OperationChannel.BotPanel).send({
                   embed: {
                     title: "実行する権限がありません。",
                     color: json[0].Yaminabe.Color.failed,
+                    footer: {
+                          text: "闇鍋bot",
+                          icon_url: "https://cdn.discordapp.com/avatars/718662724732715019/725fafaf9c00b459c74793651a51460b.png"},
                     timestamp: new Date()
                   }
                     });
           if (message.mentions.members.size !== 1)
-            return message.guild.channels.cache.get(json[0].Yaminabe.OperationChannel.BotPanel).send({
+            return await message.guild.channels.cache.get(json[0].Yaminabe.OperationChannel.BotPanel).send({
                       embed: {
                         title: "banするメンバーを1人指定してください",
                         color: json[0].Yaminabe.Color.failed,
+                        footer: {
+                              text: "闇鍋bot",
+                              icon_url: "https://cdn.discordapp.com/avatars/718662724732715019/725fafaf9c00b459c74793651a51460b.png"},
                         timestamp: new Date()
                       }
                    });
@@ -148,54 +164,51 @@ client.on("message", async message => {
                                  embed: {
                                      title: "正しい理由選択番号を入力してください。",
                                      color: json[0].Yaminabe.Color.failed,
+                                     footer: {
+                                           text: "闇鍋bot",
+                                           icon_url: "https://cdn.discordapp.com/avatars/718662724732715019/725fafaf9c00b459c74793651a51460b.png"},
                                      timestamp: new Date()
                                  }
                                });
-          
-          message.mentions.members.first().send({
-            embed: {
-              title: "Banされました。",
-              description:
-                "闇鍋サーバーにご参加いただきありがとうございます。\n\n" +
-                reason[1] +
-                "\n\nBanの解除等の申請はできません。運営が独自で判断します。\nTeam鍋 Discordサーバー 「闇鍋」   運営一同 ",
-              color: json[0].Yaminabe.Color.info,
-              timestamp: new Date(),
-              thumbnail: {
-                url:
-                  "https://cdn.discordapp.com/icons/485736439527505922/d5fb962d62a0db6bc78d95a19a69f67b.png"
-              }
-            }
-          });
-
-          const member = await message.mentions.members.first().ban(reason[0]);
-
-          message.channel.send({
-            embed: {
-              author: {
-                name: message.author.username,
-                icon_url: message.author.defaultAvatarURL
-              },
-              title: "Banned User",
-              description:
-                `${member.user.tag}をbanしました` + "\nreason : " + reason[0],
-              color: json[0].Yaminabe.Color.ban,
-              timestamp: new Date()
-            }
-          });
-          message.guild.channels.cache.get(json[0].Yaminabe.OperationChannel.log).send({
+          try{
+            message.mentions.members.first().send({
               embed: {
-                author: {
-                  name: message.author.username,
-                  icon_url: message.author.defaultAvatarURL
-                },
-                title: "Banned User",
+                title: "Banされました。",
                 description:
-                  `${member.user.tag}をbanしました` + "\nreason : " + reason[0],
-                color: json[0].Yaminabe.Color.ban,
-                timestamp: new Date()
+                  "闇鍋サーバーにご参加いただきありがとうございます。\n\n" +
+                  reason[1] +
+                  "\n\nBanの解除等の申請はできません。運営が独自で判断します。\nTeam鍋 Discordサーバー 「闇鍋」   運営一同 ",
+                color: json[0].Yaminabe.Color.info,
+                footer: {
+                      text: "闇鍋bot",
+                      icon_url: "https://cdn.discordapp.com/avatars/718662724732715019/725fafaf9c00b459c74793651a51460b.png"},
+                timestamp: new Date(),
+                thumbnail: {
+                  url:
+                    "https://cdn.discordapp.com/icons/485736439527505922/d5fb962d62a0db6bc78d95a19a69f67b.png"
+                }
               }
             });
+          }catch(e){console.log("ban system error\n"+e)}
+          const member = await message.mentions.members.first().ban(reason[0]);
+          const text = {
+                    embed: {
+                      author: {
+                        name: message.author.username,
+                        icon_url: message.author.defaultAvatarURL
+                      },
+                      title: "Banned User",
+                      description:
+                        `${member.user.tag}をbanしました` + "\nreason : " + reason[0],
+                      color: json[0].Yaminabe.Color.ban,
+                      footer: {
+                            text: "闇鍋bot",
+                            icon_url: "https://cdn.discordapp.com/avatars/718662724732715019/725fafaf9c00b459c74793651a51460b.png"},
+                      timestamp: new Date()
+                    }
+                  };
+          message.channel.send(text);
+          message.guild.channels.cache.get(json[0].Yaminabe.OperationChannel.log).send(text);
         };
 
   //owner role give system
@@ -208,6 +221,9 @@ client.on("message", async message => {
         embed: {
           title: "succeeded",
           color: json[0].Yaminabe.Color.succeeded,
+          footer: {
+                text: "闇鍋bot",
+                icon_url: "https://cdn.discordapp.com/avatars/718662724732715019/725fafaf9c00b459c74793651a51460b.png"},
           timestamp: new Date()
         }
       });
@@ -222,12 +238,16 @@ client.on("message", async message => {
                   embed: {
                     title: "実行する権限がありません。",
                     color: json[0].Yaminabe.Color.failed,
+                    footer: {
+                          text: "闇鍋bot",
+                          icon_url: "https://cdn.discordapp.com/avatars/718662724732715019/725fafaf9c00b459c74793651a51460b.png"},
                     timestamp: new Date()
                   }
                 });
       var msg = await client.channels.cache.get(json[0].Yaminabe.OperationChannel.Gamerole).messages.fetch(json[0].Yaminabe.MessageId.GamerolePanel)
-      var text =("**ゲームロール**\nリアクションを押すことで役職が付きます。\n");
-      for(var i=0; i<json[0].Yaminabe.Gamerole.length; i++){
+      var text =("**ゲームロール**\nリアクションを押すことで役職が付きます。\n" + letter[0] +" : " +json[0].Yaminabe.Gamerole[0][0]+"\n");
+      msg.react(sign[0]);
+      for(var i=1; i<json[0].Yaminabe.Gamerole.length; i++){
         text = (text + letter[i] +" : " +json[0].Yaminabe.Gamerole[i][0]+"\n");
         msg.react(sign[i]);
       };
@@ -241,12 +261,16 @@ client.on("message", async message => {
                   embed: {
                     title: "実行する権限がありません。",
                     color: json[0].Yaminabe.Color.failed,
+                    footer: {
+                          text: "闇鍋bot",
+                          icon_url: "https://cdn.discordapp.com/avatars/718662724732715019/725fafaf9c00b459c74793651a51460b.png"},
                     timestamp: new Date()
                   }
                 });
       var msg = await client.channels.cache.get(json[0].Yaminabe.OperationChannel.Compass).messages.fetch(json[0].Yaminabe.MessageId.CompassPanel)
-      var text =("**コンパスランク**\nリアクションを押すことで役職が付きます。\n");
-      for(var i=0; i<json[0].Yaminabe.CompassRank.length; i++){
+      var text =("**コンパスランク**\nリアクションを押すことで役職が付きます。\n" + letter[0] +" : " +json[0].Yaminabe.CompassRank[0][0]+"\n");
+      msg.react(sign[0]);
+      for(var i=1; i<json[0].Yaminabe.CompassRank.length; i++){
         text = (text + letter[i] +" : " +json[0].Yaminabe.CompassRank[i][0]+"\n");
         msg.react(sign[i]);
       };
@@ -272,6 +296,9 @@ client.on("messageReactionAdd", async(messageReaction ,user) =>{
           const reply = await messageReaction.message.channel.send({
                   embed: {
                     description: "コンパスランクの付与に成功しました。",
+                    "footer": {
+                            "text": "闇鍋bot",
+                            "icon_url": "https://cdn.discordapp.com/avatars/718662724732715019/725fafaf9c00b459c74793651a51460b.png"},
                     color: json[0].Yaminabe.Color.succeeded,
                   }
                 });
@@ -290,6 +317,9 @@ client.on("messageReactionAdd", async(messageReaction ,user) =>{
                   embed: {
                     description: "ゲームロールの付与に成功しました。",
                     color: json[0].Yaminabe.Color.succeeded,
+                    footer: {
+                          text: "闇鍋bot",
+                          icon_url: "https://cdn.discordapp.com/avatars/718662724732715019/725fafaf9c00b459c74793651a51460b.png"},
                   }
                 });
             reply.delete({ timeout: 5000 });
@@ -310,6 +340,9 @@ client.on("messageReactionRemove", async(messageReaction ,user) =>{
                   embed: {
                     description: "コンパスランクの削除に成功しました。",
                     color: json[0].Yaminabe.Color.succeeded,
+                   footer: {
+                        text: "闇鍋bot",
+                        icon_url: "https://cdn.discordapp.com/avatars/718662724732715019/725fafaf9c00b459c74793651a51460b.png"},
                   }
                 });
             reply.delete({ timeout: 5000 });
@@ -326,6 +359,9 @@ client.on("messageReactionRemove", async(messageReaction ,user) =>{
                   embed: {
                     description: "ゲームロールの削除に成功しました。",
                     color: json[0].Yaminabe.Color.succeeded,
+                    footer: {
+                        text: "闇鍋bot",
+                        icon_url: "https://cdn.discordapp.com/avatars/718662724732715019/725fafaf9c00b459c74793651a51460b.png"},
                   }
                 });
             reply.delete({ timeout: 5000 });
@@ -339,5 +375,3 @@ if (process.env.DISCORD_BOT_TOKEN == undefined) {
 }
 
 client.login(process.env.DISCORD_BOT_TOKEN);
-
-//console.log(Discord)
