@@ -82,8 +82,26 @@ client.on("message", async message => {
                                      timestamp: new Date()
                                  }
                                });
+        const member = await message.mentions.members.first();
+        const text ={
+            embed: {
+              author: {
+                name: message.author.username,
+                icon_url: message.author.defaultAvatarURL
+              },
+              title: "Kicked User",
+              description:
+                `${member.user.tag}をkickしました` + "\nreason : " + reason[0] +"\n執行者 : " + message.member.user.username,
+              color: json[0].Yaminabe.Color.kick,
+              footer: {
+                    text: "闇鍋bot",
+                    icon_url: "https://cdn.discordapp.com/avatars/718662724732715019/725fafaf9c00b459c74793651a51460b.png"},
+              timestamp: new Date()
+            }
+          };
+    
         try{
-          message.mentions.members.first().send({
+          member.send({
             embed: {
               title: "kickされました。",
               description:
@@ -101,29 +119,12 @@ client.on("message", async message => {
               }
             }
           });
-          }catch(e){console.log("kick system error\n"+e);};
-    
-          const member = await message.mentions.members.first().kick(reason[0]);
-    
-          const text ={
-            embed: {
-              author: {
-                name: message.author.username,
-                icon_url: message.author.defaultAvatarURL
-              },
-              title: "Kicked User",
-              description:
-                `${member.user.tag}をkickしました` + "\nreason : " + reason[0],
-              color: json[0].Yaminabe.Color.kick,
-              footer: {
-                    text: "闇鍋bot",
-                    icon_url: "https://cdn.discordapp.com/avatars/718662724732715019/725fafaf9c00b459c74793651a51460b.png"},
-              timestamp: new Date()
-            }
-          };
-    
+          
           await message.channel.send(text);
           await message.guild.channels.cache.get(json[0].Yaminabe.OperationChannel.log).send(text);
+          member.kick(reason[0]);
+          
+          }catch(e){console.log("kick system error\n"+e);}; 
         };
 
   
@@ -168,6 +169,25 @@ client.on("message", async message => {
                                      timestamp: new Date()
                                  }
                                });
+    
+          const member = await message.mentions.members.first();
+          const text = {
+                    embed: {
+                      author: {
+                        name: message.author.username,
+                        icon_url: message.author.defaultAvatarURL
+                      },
+                      title: "Banned User",
+                      description:
+                        `${member.user.tag}をbanしました` + "\nreason : " + reason[0] +"\n執行者 : " + message.member.user.username,
+                      color: json[0].Yaminabe.Color.ban,
+                      footer: {
+                            text: "闇鍋bot",
+                            icon_url: "https://cdn.discordapp.com/avatars/718662724732715019/725fafaf9c00b459c74793651a51460b.png"},
+                      timestamp: new Date()
+                    }
+                  };
+    
           try{
             message.mentions.members.first().send({
               embed: {
@@ -187,28 +207,14 @@ client.on("message", async message => {
                 }
               }
             });
+            
+            message.channel.send(text);
+            message.guild.channels.cache.get(json[0].Yaminabe.OperationChannel.log).send(text);
+            member.ban(reason[0]);
           }catch(e){console.log("ban system error\n"+e)}
-          const member = await message.mentions.members.first().ban(reason[0]);
-          const text = {
-                    embed: {
-                      author: {
-                        name: message.author.username,
-                        icon_url: message.author.defaultAvatarURL
-                      },
-                      title: "Banned User",
-                      description:
-                        `${member.user.tag}をbanしました` + "\nreason : " + reason[0],
-                      color: json[0].Yaminabe.Color.ban,
-                      footer: {
-                            text: "闇鍋bot",
-                            icon_url: "https://cdn.discordapp.com/avatars/718662724732715019/725fafaf9c00b459c74793651a51460b.png"},
-                      timestamp: new Date()
-                    }
-                  };
-          message.channel.send(text);
-          message.guild.channels.cache.get(json[0].Yaminabe.OperationChannel.log).send(text);
         };
 
+  
   //owner role give system
   if (message.content.startsWith("//owner")) {
     if (!(message.channel.id === json[0].Yaminabe.OperationChannel.Emergency)) return message.delete();
@@ -281,7 +287,11 @@ client.on("message", async message => {
     message.channel.send("test");
     await message.react(sign[20])
   }
+  if(message.content.startsWith("//sent")){
+    console.log(message.member.user)
+  }
 });
+
 
 client.on("messageReactionAdd", async(messageReaction ,user) =>{
   if(user.bot) return;
@@ -365,6 +375,12 @@ client.on("messageReactionRemove", async(messageReaction ,user) =>{
             reply.delete({ timeout: 5000 });
         };
     }; 
+});
+
+//new visitor announce
+client.on('guildMemberAdd', member => {
+    const text = ("<@"+member.id+"> さん、 team鍋公式Discordサーバー「闇鍋」にご参加いただきありがとうございます！！\n当サーバーに参加後、<#"+ json[0].Yaminabe.Channels[1] +">・<#"+ json[0].Yaminabe.Channels[2] +">をお読みください。\nその後、<#"+ json[0].Yaminabe.Channels[3] +">に自己紹介をお願いします。\n自己紹介が運営に確認され次第、ほかのコンテンツが使用可能になります。")
+    member.guild.channels.cache.get(json[0].Yaminabe.Channels[0]).send(text);
 });
 
 if (process.env.DISCORD_BOT_TOKEN == undefined) {
